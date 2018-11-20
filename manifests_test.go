@@ -118,3 +118,34 @@ func TestCheckBool(t *testing.T) {
 
 	assert.Equal(t, err, errTooBig)
 }
+
+func TestResourceType(t *testing.T) {
+	found, err := ResourceType(
+		map[string]interface{}{
+			"apiVersion": "apps/v1",
+			"kind":       "Deployment",
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "io.k8s.api.apps.v1.Deployment", found)
+
+	found, err = ResourceType(
+		map[string]interface{}{
+			"apiVersion": "v1",
+			"kind":       "Service",
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "io.k8s.api.core.v1.Service", found)
+
+	_, err = ResourceType(
+		map[string]interface{}{
+			"apiVersion": "v1",
+			"kind":       "HERP",
+		},
+	)
+
+	assert.Equal(t, errNoSuchType, err)
+}

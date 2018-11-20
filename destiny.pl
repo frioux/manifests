@@ -46,6 +46,23 @@ for my $def (@defs) {
   $str .= qq(\t\t},\n);
 }
 $str .= "\t}\n";
+$str .= "}\n\n";
+
+$str .= "func init() {\n";
+$str .= "\ttypes = map[ktype]string{\n";
+my %defs = %{$doc->{definitions}};
+for my $def (sort keys %defs) {
+  my $mappings = $defs{$def}{'x-kubernetes-group-version-kind'};
+  next if !$mappings;
+
+  for my $m (@$mappings) {
+    $str .=  qq(\t\tktype{group: "$m->{group}", kind: "$m->{kind}", version: "$m->{version}"}: "$def",\n);
+  }
+
+  $str .= "\n";
+
+}
+$str .= "\t}\n";
 $str .= "}\n";
 
 open my $fh, '>', $out_file;

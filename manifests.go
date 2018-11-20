@@ -89,8 +89,11 @@ func Check(h interface{}, path []string, f func(interface{}) error) (bool, error
 	return Check(inner, path[1:], f)
 }
 
-// XXX this should probably actually use the swagger api and resolve from the
-// x-kubernetes-group-version-kind field
+type ktype struct{ group, kind, version string }
+
+var types map[ktype]string
+
+var errNoSuchType = errors.New("no such type")
 
 // ResourceType resolves the kind and apiVersion to a single ResourceType string
 func ResourceType(h interface{}) (string, error) {
@@ -121,8 +124,16 @@ func ResourceType(h interface{}) (string, error) {
 
 	split := strings.Split(apiVersion, "/")
 	if len(split) == 2 {
-		return strings.Join([]string{"io", "k8s", "api", split[0], split[1], kind}, "."), nil
+		found, kok := types[ktype{group: split[0], version: split[1], kind: kind}]
+		if !kok {
+			return "", errNoSuchType
+		}
+		return found, nil
 	}
 
-	return strings.Join([]string{"io", "k8s", "api", apiVersion, kind}, "."), nil
+	found, kok := types[ktype{version: apiVersion, kind: kind}]
+	if !kok {
+		return "", errNoSuchType
+	}
+	return found, nil
 }
