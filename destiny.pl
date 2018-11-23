@@ -35,7 +35,7 @@ for my $def (@defs) {
 
     push @{$merged{$found->{definition}}}, $found->{path};
   }
-  for my $from (keys %merged) {
+  for my $from (sort keys %merged) {
     $str .= qq(\t\t\t"$from": [][]string{\n);
 
     for my $path (@{$merged{$from}}) {
@@ -77,7 +77,7 @@ sub _path_for {
 
    my @ret;
 
-   my @possible_properties = keys %$doc;
+   my @possible_properties = sort keys %$doc;
    for my $pprop (sort @possible_properties) {
       if ($pprop eq '$ref' && $doc->{$pprop} eq $needle) {
          push @ret, [];
