@@ -32,7 +32,13 @@ spec:
         securityContext:
           runAsUser: 1001
         image: "ubuntu:14.04"
-        command: [ "bash", "-c", "env"]`))
+        command: [ "bash", "-c", "env"]
+      - name: world
+        securityContext:
+          runAsUser: 1001
+        image: "ubuntu:14.04"
+        command: [ "bash", "-c", "echo 'woo!'"]
+`))
 
 	err := d.Decode(&r)
 	if err != nil {
@@ -102,6 +108,14 @@ spec:
 	//         - env
 	//         image: ubuntu:14.04
 	//         name: hello
+	//         securityContext:
+	//           runAsUser: 1001
+	//       - command:
+	//         - bash
+	//         - -c
+	//         - echo 'woo!'
+	//         image: ubuntu:14.04
+	//         name: world
 	//         securityContext:
 	//           runAsUser: 1001
 	//       shareProcessNamespace: true
